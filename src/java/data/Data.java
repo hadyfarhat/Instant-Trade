@@ -5,7 +5,6 @@
  */
 package data;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,12 +17,6 @@ import org.json.simple.parser.ParseException;
  * @author hadyfarhat
  */
 public class Data {
-//     String databaseName = "instanttrade.db";
-////            String filePath = System.getProperty("user.dir") + "/src/java/db/" + databaseName;
-//    String filePath = System.getProperty("user.dir") + "/" +databaseName;
-//    System.out.println("User dir: " + System.getProperty("user.dir"));
-//    File f = new File(filePath);
-//    System.out.println(f.exists());
     
     public JSONObject getAllShares() {
         JSONObject shares = new JSONObject();
@@ -36,13 +29,12 @@ public class Data {
             shares = (JSONObject) obj;
             System.out.println(shares);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+        } catch (IOException | ParseException e) {
+            System.out.println(e.getMessage());
         }
             
         return shares;
     }
+    
 }
