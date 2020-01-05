@@ -5,6 +5,7 @@
  */
 package InstantTradeWS;
 
+// Local Libraries
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -13,9 +14,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
+import java.util.HashMap;
 
+// Local Third Party Libraries
 import org.json.simple.JSONObject;
 
+// Local Custom Class
+import data.Data;
+import java.util.Iterator;
 /**
  * REST Web Service
  *
@@ -39,19 +45,17 @@ public class InstantTrade {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getJson() {
-        //TODO return proper representation object
-//        throw new UnsupportedOperationException();
-        JSONObject obj = new JSONObject();
-        String text;
-        
-        obj.put("name", "hadi");
-        obj.put("age", 22);
-        
-        text = obj.toString();
-        return text;
+    public String getAllShares() {
+       Data data = new Data();
+       JSONObject shares = data.getAllShares();
+       for(Iterator iterator = shares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            System.out.println(shares.get(key));
+            System.out.println("---------------");
+        }
+       return shares.toString();
     }
-
+ 
     /**
      * PUT method for updating or creating an instance of InstantTrade
      * @param content representation for the resource
