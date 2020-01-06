@@ -85,7 +85,7 @@ public class InstantTrade {
      */
     @GET @Path("shares/available/greater/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getShareGreaterAvailable(@PathParam("numberOfShares") int numberOfShares) {
+    public String getSharesGreaterAvailable(@PathParam("numberOfShares") int numberOfShares) {
         Data data = new Data();
         JSONObject shares = data.getSharesGreaterAvailable(numberOfShares);
         return shares.toString();
@@ -98,7 +98,7 @@ public class InstantTrade {
      */
     @GET @Path("shares/available/less/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getShareLessAvailable(@PathParam("numberOfShares") int numberOfShares) {
+    public String getSharesLessAvailable(@PathParam("numberOfShares") int numberOfShares) {
         Data data = new Data();
         JSONObject shares = data.getSharesLessAvailable(numberOfShares);
         return shares.toString();
@@ -140,6 +140,19 @@ public class InstantTrade {
     public String getSharesGreaterPriceValue(@PathParam("value") int value) {
         Data data = new Data();
         JSONObject shares = data.getSharesGreaterPriceValue(value);
+        return shares.toString();
+    }
+    
+    
+    /**
+     * Get shares that have price value equal to passed param
+     * @return JSONObject
+     */
+    @GET @Path("shares/value/equal/{value}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getSharesEqualPriceValue(@PathParam("value") int value) {
+        Data data = new Data();
+        JSONObject shares = data.getSharesEqualPriceValue(value);
         return shares.toString();
     }
     
