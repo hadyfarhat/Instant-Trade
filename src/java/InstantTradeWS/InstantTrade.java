@@ -5,7 +5,7 @@
  */
 package InstantTradeWS;
 
-// Local Libraries
+// Standard Libraries
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -14,16 +14,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
-import java.util.HashMap;
-
-// Local Third Party Libraries
-import org.json.simple.JSONObject;
-
-// Local Custom Class
-import data.Data;
-import java.util.Iterator;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.PathParam;
+
+// External Libraries
+import org.json.simple.JSONObject;
+
+// Custom Classes
+import data.Data;
 /**
  * REST Web Service
  *

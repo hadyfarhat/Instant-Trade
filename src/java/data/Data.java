@@ -5,11 +5,16 @@
  */
 package data;
 
+// Standard Libraries
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+// External Libraries
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -22,6 +27,14 @@ public class Data {
     
     private String dataFileName = "shares.json";
     private String dataFilePath = System.getProperty("user.dir") + "/" + this.dataFileName;
+    
+    private String getCurrentDateTime() {
+        LocalDateTime date = LocalDateTime.now();
+	DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String formattedDate = date.format(dateFormat);
+        
+        return formattedDate;
+    }
     
     public JSONObject getAllShares() {
         JSONObject shares = new JSONObject();
@@ -108,8 +121,10 @@ public class Data {
         if (availableCompanyShares < numberOfShares) {
             return "Your requested shares amount is greater than the company's available shares";
         }
-
+        
+        String currentDateTime = this.getCurrentDateTime();
         shareData.put("available", availableCompanyShares - numberOfShares);
+        shareData.put("lastUpdated", currentDateTime);
         allShares.put(shareData.get("companySymbol"), shareData);
 
         try {
