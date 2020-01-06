@@ -59,8 +59,8 @@ public class InstantTrade {
     @Produces(MediaType.APPLICATION_JSON)
     public String getShareByCompanySymbol(@PathParam("companySymbol") String companySymbol) {
         Data data = new Data();
-        JSONObject shareData = data.getShareDataByCompanySymbol(companySymbol);
-        return shareData.toString();
+        JSONObject share = data.getShareDataByCompanySymbol(companySymbol);
+        return share.toString();
     }
     
     /**
@@ -70,8 +70,20 @@ public class InstantTrade {
     @Produces(MediaType.APPLICATION_JSON)
     public String getShareByCompanyName(@PathParam("companyName") String companyName) {
         Data data = new Data();
-        JSONObject shareData = data.getShareDataByCompanyName(companyName);
-        return shareData.toString();
+        JSONObject share = data.getShareDataByCompanyName(companyName);
+        return share.toString();
+    }
+    
+    
+    /**
+     * Gets a Share that has available shares > passed param
+     */
+    @GET @Path("share/available/greater/{numberOfShares}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getShareGreaterAvailable(@PathParam("numberOfShares") int numberOfShares) {
+        Data data = new Data();
+        JSONObject shares = data.getShareGreaterAvailable(numberOfShares);
+        return shares.toString();
     }
  
     /**

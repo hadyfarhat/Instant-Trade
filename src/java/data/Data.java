@@ -135,24 +135,26 @@ public class Data {
     
     
     /**
-     * Validation to check the passed company symbol parameter exists in shares data file
-     * @param companySymbol
-     * @return boolean
+     * Loop through shares JSON file and search for a share that has available shares greater than passed number of shares
+     * Append each time a share is found to a json object
+     * @param numberOfShares
+     * @return JSONObject
      */
-    private boolean checkIfCompanySymbolExists(String companySymbol) {
-        JSONObject companyData = new JSONObject();
+    public JSONObject getShareGreaterAvailable(int numberOfShares) {
+        JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
         for(Iterator iterator = allShares.keySet().iterator(); iterator.hasNext();) {
             String key = (String) iterator.next();
-            if (key.equals(companySymbol)) {
-                return true;
+            JSONObject temp = (JSONObject) allShares.get(key);
+            if (Integer.parseInt(temp.get("available").toString()) > numberOfShares) {
+                foundShares.put(temp.get("companySymbol"), temp);
             }
         }
         
-        return false;
+        return foundShares;
     }
-    
+
     
     /**
      * First check if company symbol exists
@@ -167,7 +169,7 @@ public class Data {
         JSONObject allShares = this.getAllShares();
         JSONObject shareData = this.getShareDataByCompanySymbol(companySymbol);
         
-        if (shareData.size() == 0) {
+        if (shareData.isEmpty()) {
             return "Share doesn't exist";
         }
         
@@ -194,7 +196,7 @@ public class Data {
     
     public static void main(String[] args) {
         Data d = new Data();
-        System.out.println(d.buyShares("AFC", 5));
+        System.out.println(d.getShareGreaterAvailable(100));
     }
     
 }
