@@ -39,6 +39,7 @@ public class InstantTrade {
     public InstantTrade() {
     }
 
+    
     /**
      * Gets all shares from shares json file
      * @return JSONObject shares
@@ -51,8 +52,9 @@ public class InstantTrade {
        return shares.toString();
     }
     
+    
     /**
-     * Gets a Share based on the company symbol passed as a parameter
+     * Gets a share based on the company symbol passed as a parameter
      * @return JSONObject
      */
     @GET @Path("share/symbol/{companySymbol}")
@@ -63,8 +65,10 @@ public class InstantTrade {
         return share.toString();
     }
     
+    
     /**
-     * Gets a Share based on company name
+     * Gets a share based on company name
+     * @return JSONObject
      */
     @GET @Path("share/name/{companyName}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -76,27 +80,56 @@ public class InstantTrade {
     
     
     /**
-     * Gets a Share that has available shares greater than passed param
+     * Get shares that have available greater than passed param
+     * @return JSONObject
      */
-    @GET @Path("share/available/greater/{numberOfShares}")
+    @GET @Path("shares/available/greater/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getShareGreaterAvailable(@PathParam("numberOfShares") int numberOfShares) {
         Data data = new Data();
-        JSONObject shares = data.getShareGreaterAvailable(numberOfShares);
+        JSONObject shares = data.getSharesGreaterAvailable(numberOfShares);
         return shares.toString();
     }
     
     
     /**
-     * Gets a Share that has available shares less than passed param
+     * Get shares that have available less than passed param
+     * @return JSONObject
      */
-    @GET @Path("share/available/less/{numberOfShares}")
+    @GET @Path("shares/available/less/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getShareLessAvailable(@PathParam("numberOfShares") int numberOfShares) {
         Data data = new Data();
-        JSONObject shares = data.getShareLessAvailable(numberOfShares);
+        JSONObject shares = data.getSharesLessAvailable(numberOfShares);
         return shares.toString();
     }
+    
+    
+    /**
+     * Get shares based on the currency passed as a parameter
+     * @return JSONObject
+     */
+    @GET @Path("shares/currency/{currency}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getSharesByCurrency(@PathParam("currency") String currency) {
+        Data data = new Data();
+        JSONObject share = data.getSharesByCurrency(currency);
+        return share.toString();
+    }
+    
+    
+    /**
+     * Get shares that has price value less than passed param
+     * @return JSONObject
+     */
+    @GET @Path("shares/value/less/{value}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getSharesLessPriceValue(@PathParam("value") int value) {
+        Data data = new Data();
+        JSONObject shares = data.getSharesLessPriceValue(value);
+        return shares.toString();
+    }
+    
  
     /**
      * Updates number of available shares

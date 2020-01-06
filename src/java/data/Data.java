@@ -140,7 +140,7 @@ public class Data {
      * @param numberOfShares
      * @return JSONObject
      */
-    public JSONObject getShareGreaterAvailable(int numberOfShares) {
+    public JSONObject getSharesGreaterAvailable(int numberOfShares) {
         JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
@@ -155,14 +155,14 @@ public class Data {
         return foundShares;
     }
     
-    
+
     /**
      * Loop through shares JSON file and search for a share that has available shares less than passed number of shares
      * Append each time a share is found to a json object
      * @param numberOfShares
      * @return JSONObject
      */
-    public JSONObject getShareLessAvailable(int numberOfShares) {
+    public JSONObject getSharesLessAvailable(int numberOfShares) {
         JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
@@ -170,6 +170,52 @@ public class Data {
             String key = (String) iterator.next();
             JSONObject temp = (JSONObject) allShares.get(key);
             if (Integer.parseInt(temp.get("available").toString()) < numberOfShares) {
+                foundShares.put(temp.get("companySymbol"), temp);
+            }
+        }
+        
+        return foundShares;
+    }
+    
+    
+    /**
+     * Loop through shares JSON file and search for a share that has a currency same as the one passed as a parameter
+     * Append each time a share is found to a json object
+     * @param currency
+     * @return JSONObject
+     */
+    public JSONObject getSharesByCurrency(String currency) {
+        JSONObject foundShares = new JSONObject();
+        JSONObject allShares = this.getAllShares();
+
+        for(Iterator iterator = allShares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject temp = (JSONObject) allShares.get(key);
+            JSONObject tempSharePrice = (JSONObject) temp.get("sharePrice");
+            if (tempSharePrice.get("currency").equals(currency)) {
+                foundShares.put(temp.get("companySymbol"), temp);
+            }
+        }
+        
+        return foundShares;
+    }
+    
+    
+     /**
+     * Loop through shares JSON file and search for a share that has value less than passed parameter
+     * Append each time a share is found to a json object
+     * @param value
+     * @return JSONObject
+     */
+    public JSONObject getSharesLessPriceValue(int value) {
+        JSONObject foundShares = new JSONObject();
+        JSONObject allShares = this.getAllShares();
+
+        for(Iterator iterator = allShares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject temp = (JSONObject) allShares.get(key);
+            JSONObject tempSharePrice = (JSONObject) temp.get("sharePrice");
+            if (Integer.parseInt(tempSharePrice.get("value").toString()) < value) {
                 foundShares.put(temp.get("companySymbol"), temp);
             }
         }
@@ -218,7 +264,7 @@ public class Data {
     
     public static void main(String[] args) {
         Data d = new Data();
-        System.out.println(d.getShareGreaterAvailable(100));
+        System.out.println(d.getSharesByCurrency("£"));
     }
     
 }
