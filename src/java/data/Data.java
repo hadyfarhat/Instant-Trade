@@ -154,6 +154,28 @@ public class Data {
         
         return foundShares;
     }
+    
+    
+    /**
+     * Loop through shares JSON file and search for a share that has available shares less than passed number of shares
+     * Append each time a share is found to a json object
+     * @param numberOfShares
+     * @return JSONObject
+     */
+    public JSONObject getShareLessAvailable(int numberOfShares) {
+        JSONObject foundShares = new JSONObject();
+        JSONObject allShares = this.getAllShares();
+
+        for(Iterator iterator = allShares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject temp = (JSONObject) allShares.get(key);
+            if (Integer.parseInt(temp.get("available").toString()) < numberOfShares) {
+                foundShares.put(temp.get("companySymbol"), temp);
+            }
+        }
+        
+        return foundShares;
+    }
 
     
     /**

@@ -76,13 +76,25 @@ public class InstantTrade {
     
     
     /**
-     * Gets a Share that has available shares > passed param
+     * Gets a Share that has available shares greater than passed param
      */
     @GET @Path("share/available/greater/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getShareGreaterAvailable(@PathParam("numberOfShares") int numberOfShares) {
         Data data = new Data();
         JSONObject shares = data.getShareGreaterAvailable(numberOfShares);
+        return shares.toString();
+    }
+    
+    
+    /**
+     * Gets a Share that has available shares less than passed param
+     */
+    @GET @Path("share/available/less/{numberOfShares}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getShareLessAvailable(@PathParam("numberOfShares") int numberOfShares) {
+        Data data = new Data();
+        JSONObject shares = data.getShareLessAvailable(numberOfShares);
         return shares.toString();
     }
  
