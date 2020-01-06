@@ -42,25 +42,25 @@ public class Data {
     
     /**
      * Loop through shares JSON file and search for the passed company symbol parameter
-     * if found => return company data as a JSON object
+     * if found => return share data as a JSON object
      * if not found => return an empty JSON object
      * @param companySymbol
      * @return JSONObject
      */
-    public JSONObject getCompanyData(String companySymbol) {
-        JSONObject companyData = new JSONObject();
+    public JSONObject getShareData(String companySymbol) {
+        JSONObject shareData = new JSONObject();
         
         JSONObject allShares = this.getAllShares();
 
         for(Iterator iterator = allShares.keySet().iterator(); iterator.hasNext();) {
             String key = (String) iterator.next();
             if (key.equals(companySymbol)) {
-                companyData = (JSONObject) allShares.get(key);
+                shareData = (JSONObject) allShares.get(key);
                 break;
             }
         }
         
-        return companyData;
+        return shareData;
     }
     
     
@@ -97,20 +97,20 @@ public class Data {
      */
     public String buyShares(String companySymbol, int numberOfShares) {
         JSONObject allShares = this.getAllShares();
-        JSONObject companyData = this.getCompanyData(companySymbol);
+        JSONObject shareData = this.getShareData(companySymbol);
         
-        if (companyData.size() == 0) {
-            return "Company doesn't exist";
+        if (shareData.size() == 0) {
+            return "Share doesn't exist";
         }
         
-        int availableCompanyShares = Integer.parseInt(companyData.get("available").toString());
+        int availableCompanyShares = Integer.parseInt(shareData.get("available").toString());
         
         if (availableCompanyShares < numberOfShares) {
             return "Your requested shares amount is greater than the company's available shares";
         }
 
-        companyData.put("available", availableCompanyShares - numberOfShares);
-        allShares.put(companyData.get("companySymbol"), companyData);
+        shareData.put("available", availableCompanyShares - numberOfShares);
+        allShares.put(shareData.get("companySymbol"), shareData);
 
         try {
             this.saveJsonObjectToFile(this.dataFilePath, allShares);

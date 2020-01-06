@@ -42,8 +42,8 @@ public class InstantTrade {
     }
 
     /**
-     * Retrieves representation of an instance of InstantTradeWS.InstantTrade
-     * @return an instance of java.lang.String
+     * Gets all shares from shares json file
+     * @return JSONObject shares
      */
     @GET @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
@@ -52,15 +52,27 @@ public class InstantTrade {
        JSONObject shares = data.getAllShares();
        return shares.toString();
     }
+    
+    /**
+     * Gets a Share based on the company symbol passed as a parameter
+     * @return JSONObject
+     */
+    @GET @Path("share/{companySymbol}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getShare(@PathParam("companySymbol") String companySymbol) {
+        Data data = new Data();
+        JSONObject shareData = data.getShareData(companySymbol);
+        return shareData.toString();
+    }
  
     /**
      * Updates number of available shares
+     * @return String status message
      */
     @PUT @Path("buy")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String putJson(@FormParam("companySymbol") String companySymbol, @FormParam("numberOfShares") int numberOfShares) {
         Data data = new Data();
-        data.buyShares(companySymbol, numberOfShares);
-        return "Ok";
+        return data.buyShares(companySymbol, numberOfShares);
     }
 }
