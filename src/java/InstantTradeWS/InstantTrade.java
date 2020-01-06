@@ -119,7 +119,7 @@ public class InstantTrade {
     
     
     /**
-     * Get shares that has price value less than passed param
+     * Get shares that have price value less than passed param
      * @return JSONObject
      */
     @GET @Path("shares/value/less/{value}")
@@ -127,6 +127,19 @@ public class InstantTrade {
     public String getSharesLessPriceValue(@PathParam("value") int value) {
         Data data = new Data();
         JSONObject shares = data.getSharesLessPriceValue(value);
+        return shares.toString();
+    }
+    
+    
+    /**
+     * Get shares that have price value greater than passed param
+     * @return JSONObject
+     */
+    @GET @Path("shares/value/greater/{value}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getSharesGreaterPriceValue(@PathParam("value") int value) {
+        Data data = new Data();
+        JSONObject shares = data.getSharesGreaterPriceValue(value);
         return shares.toString();
     }
     

@@ -201,7 +201,7 @@ public class Data {
     }
     
     
-     /**
+    /**
      * Loop through shares JSON file and search for a share that has value less than passed parameter
      * Append each time a share is found to a json object
      * @param value
@@ -222,6 +222,30 @@ public class Data {
         
         return foundShares;
     }
+    
+    
+    /**
+     * Loop through shares JSON file and search for a share that has value greater than passed parameter
+     * Append each time a share is found to a json object
+     * @param value
+     * @return JSONObject
+     */
+    public JSONObject getSharesGreaterPriceValue(int value) {
+        JSONObject foundShares = new JSONObject();
+        JSONObject allShares = this.getAllShares();
+
+        for(Iterator iterator = allShares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject temp = (JSONObject) allShares.get(key);
+            JSONObject tempSharePrice = (JSONObject) temp.get("sharePrice");
+            if (Integer.parseInt(tempSharePrice.get("value").toString()) > value) {
+                foundShares.put(temp.get("companySymbol"), temp);
+            }
+        }
+        
+        return foundShares;
+    }
+    
 
     
     /**
