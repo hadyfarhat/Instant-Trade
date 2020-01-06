@@ -22,12 +22,14 @@ import org.json.simple.JSONObject;
 // Local Custom Class
 import data.Data;
 import java.util.Iterator;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.PathParam;
 /**
  * REST Web Service
  *
  * @author hadyfarhat
  */
-@Path("instanttrade")
+@Path("")
 public class InstantTrade {
 
     @Context
@@ -43,25 +45,22 @@ public class InstantTrade {
      * Retrieves representation of an instance of InstantTradeWS.InstantTrade
      * @return an instance of java.lang.String
      */
-    @GET
+    @GET @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllShares() {
        Data data = new Data();
        JSONObject shares = data.getAllShares();
-       for(Iterator iterator = shares.keySet().iterator(); iterator.hasNext();) {
-            String key = (String) iterator.next();
-            System.out.println(shares.get(key));
-            System.out.println("---------------");
-        }
        return shares.toString();
     }
  
     /**
-     * PUT method for updating or creating an instance of InstantTrade
-     * @param content representation for the resource
+     * Updates number of available shares
      */
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void putJson(String content) {
+    @PUT @Path("buy")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String putJson(@FormParam("companySymbol") String companySymbol, @FormParam("numberOfShares") int numberOfShares) {
+        Data data = new Data();
+        data.buyShares(companySymbol, numberOfShares);
+        return "Ok";
     }
 }
