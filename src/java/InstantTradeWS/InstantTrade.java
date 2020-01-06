@@ -106,6 +106,19 @@ public class InstantTrade {
     
     
     /**
+     * Get shares that have available equal to passed param
+     * @return JSONObject
+     */
+    @GET @Path("shares/available/equal/{numberOfShares}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getSharesEqualAvailable(@PathParam("numberOfShares") int numberOfShares) {
+        Data data = new Data();
+        JSONObject shares = data.getSharesEqualAvailable(numberOfShares);
+        return shares.toString();
+    }
+    
+    
+    /**
      * Get shares based on the currency passed as a parameter
      * @return JSONObject
      */
