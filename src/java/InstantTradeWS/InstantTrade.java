@@ -55,11 +55,22 @@ public class InstantTrade {
      * Gets a Share based on the company symbol passed as a parameter
      * @return JSONObject
      */
-    @GET @Path("share/{companySymbol}")
+    @GET @Path("share/symbol/{companySymbol}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getShare(@PathParam("companySymbol") String companySymbol) {
+    public String getShareByCompanySymbol(@PathParam("companySymbol") String companySymbol) {
         Data data = new Data();
-        JSONObject shareData = data.getShareData(companySymbol);
+        JSONObject shareData = data.getShareDataByCompanySymbol(companySymbol);
+        return shareData.toString();
+    }
+    
+    /**
+     * Gets a Share based on company name
+     */
+    @GET @Path("share/name/{companyName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getShareByCompanyName(@PathParam("companyName") String companyName) {
+        Data data = new Data();
+        JSONObject shareData = data.getShareDataByCompanyName(companyName);
         return shareData.toString();
     }
  
