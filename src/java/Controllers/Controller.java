@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package InstantTradeWS;
+package Controllers;
 
 // Standard Libraries
 import javax.ws.rs.core.Context;
@@ -21,14 +21,20 @@ import javax.ws.rs.PathParam;
 import org.json.simple.JSONObject;
 
 // Custom Classes
-import data.Data;
+import Model.Model;
+import java.io.IOException;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 /**
  * REST Web Service
  *
  * @author hadyfarhat
  */
 @Path("")
-public class InstantTrade {
+public class Controller {
 
     @Context
     private UriInfo context;
@@ -36,7 +42,7 @@ public class InstantTrade {
     /**
      * Creates a new instance of InstantTrade
      */
-    public InstantTrade() {
+    public Controller() {
     }
 
     
@@ -47,7 +53,7 @@ public class InstantTrade {
     @GET @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllShares() {
-       Data data = new Data();
+       Model data = new Model();
        JSONObject shares = data.getAllShares();
        return shares.toString();
     }
@@ -60,7 +66,7 @@ public class InstantTrade {
     @GET @Path("share/symbol/{companySymbol}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getShareByCompanySymbol(@PathParam("companySymbol") String companySymbol) {
-        Data data = new Data();
+        Model data = new Model();
         JSONObject share = data.getShareDataByCompanySymbol(companySymbol);
         return share.toString();
     }
@@ -73,7 +79,7 @@ public class InstantTrade {
     @GET @Path("share/name/{companyName}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getShareByCompanyName(@PathParam("companyName") String companyName) {
-        Data data = new Data();
+        Model data = new Model();
         JSONObject share = data.getShareDataByCompanyName(companyName);
         return share.toString();
     }
@@ -86,7 +92,7 @@ public class InstantTrade {
     @GET @Path("shares/available/greater/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesGreaterAvailable(@PathParam("numberOfShares") int numberOfShares) {
-        Data data = new Data();
+        Model data = new Model();
         JSONObject shares = data.getSharesGreaterAvailable(numberOfShares);
         return shares.toString();
     }
@@ -99,7 +105,7 @@ public class InstantTrade {
     @GET @Path("shares/available/less/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesLessAvailable(@PathParam("numberOfShares") int numberOfShares) {
-        Data data = new Data();
+        Model data = new Model();
         JSONObject shares = data.getSharesLessAvailable(numberOfShares);
         return shares.toString();
     }
@@ -112,7 +118,7 @@ public class InstantTrade {
     @GET @Path("shares/available/equal/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesEqualAvailable(@PathParam("numberOfShares") int numberOfShares) {
-        Data data = new Data();
+        Model data = new Model();
         JSONObject shares = data.getSharesEqualAvailable(numberOfShares);
         return shares.toString();
     }
@@ -125,9 +131,9 @@ public class InstantTrade {
     @GET @Path("shares/currency/{currency}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesByCurrency(@PathParam("currency") String currency) {
-        Data data = new Data();
-        JSONObject share = data.getSharesByCurrency(currency);
-        return share.toString();
+        Model data = new Model();
+        JSONObject shares = data.getSharesByCurrency(currency);
+        return shares.toString();
     }
     
     
@@ -138,7 +144,7 @@ public class InstantTrade {
     @GET @Path("shares/value/less/{value}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesLessPriceValue(@PathParam("value") int value) {
-        Data data = new Data();
+        Model data = new Model();
         JSONObject shares = data.getSharesLessPriceValue(value);
         return shares.toString();
     }
@@ -151,7 +157,7 @@ public class InstantTrade {
     @GET @Path("shares/value/greater/{value}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesGreaterPriceValue(@PathParam("value") int value) {
-        Data data = new Data();
+        Model data = new Model();
         JSONObject shares = data.getSharesGreaterPriceValue(value);
         return shares.toString();
     }
@@ -164,7 +170,7 @@ public class InstantTrade {
     @GET @Path("shares/value/equal/{value}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesEqualPriceValue(@PathParam("value") int value) {
-        Data data = new Data();
+        Model data = new Model();
         JSONObject shares = data.getSharesEqualPriceValue(value);
         return shares.toString();
     }
@@ -177,7 +183,16 @@ public class InstantTrade {
     @PUT @Path("buy")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String putJson(@FormParam("companySymbol") String companySymbol, @FormParam("numberOfShares") int numberOfShares) {
-        Data data = new Data();
+        Model data = new Model();
         return data.buyShares(companySymbol, numberOfShares);
     }
+    
+    
+    @GET @Path("currencyconversion/test")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String testCurrencyConversion() throws IOException {
+        String rate = Request.Get("http://localhost:8080/CurrencyConvertor/webresources/CurrencyConvertor").execute().returnContent().toString();
+        return rate;
+    }
+    
 }

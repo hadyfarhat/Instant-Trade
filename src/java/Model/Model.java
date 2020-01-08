@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package data;
+package Model;
 
 // Standard Libraries
 import java.io.FileNotFoundException;
@@ -23,7 +23,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author hadyfarhat
  */
-public class Data {
+public class Model {
     
     private String dataFileName = "shares.json";
     private String dataFilePath = System.getProperty("user.dir") + "/" + this.dataFileName;
@@ -290,7 +290,6 @@ public class Data {
         
         return foundShares;
     }
-    
 
     
     /**
@@ -332,7 +331,7 @@ public class Data {
     
     
     public static void main(String[] args) {
-        Data d = new Data();
+        Model d = new Model();
         System.out.println(d.getSharesEqualAvailable(100));
     }
     
