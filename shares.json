@@ -19,16 +19,6 @@
             "value": "15"
         }
     },
-    "JUVE": {
-        "lastUpdated": "22-12-2019",
-        "companySymbol": "JUVE",
-        "companyName": "Juventus",
-        "available": "99",
-        "sharePrice": {
-            "currency": "\u20AC",
-            "value": "11"
-        }
-    },
     "AFC": {
         "lastUpdated": "13-09-2019",
         "companySymbol": "AFC",
@@ -37,16 +27,6 @@
         "sharePrice": {
             "currency": "£",
             "value": "31"
-        }
-    },
-    "BVB": {
-        "lastUpdated": "12-05-2019",
-        "companySymbol": "BVB",
-        "companyName": "Borussia Dortmund",
-        "available": "150",
-        "sharePrice": {
-            "currency": "\u20AC",
-            "value": "5"
         }
     }
 }

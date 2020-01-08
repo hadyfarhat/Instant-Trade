@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model;
+package Models;
 
 // Standard Libraries
 import java.io.FileNotFoundException;
@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import org.apache.http.client.fluent.Request;
 
 // External Libraries
 import org.json.simple.JSONObject;
@@ -25,8 +26,9 @@ import org.json.simple.parser.ParseException;
  */
 public class Model {
     
-    private String dataFileName = "shares.json";
-    private String dataFilePath = System.getProperty("user.dir") + "/" + this.dataFileName;
+    private final String dataFileName = "shares.json";
+    private final String dataFilePath = System.getProperty("user.dir") + "/" + this.dataFileName;
+    private final String apiKey = "MWROBPMAUOMA9TRG";
     
     
     /**
@@ -67,12 +69,12 @@ public class Model {
     
     /**
      * Uses Json Parser to parse shares data json file into a json object
-     * @return JSONObject shares data
+     * @return String shares json data
      */
-    public JSONObject getAllShares() {
+    private String getAllSharesFromStorage() {
         JSONObject shares = new JSONObject();
         JSONParser jsonParser = new JSONParser();
-        try (FileReader reader = new FileReader(dataFilePath)) {
+        try (FileReader reader = new FileReader(this.dataFilePath)) {
             //Read JSON file
             Object obj = jsonParser.parse(reader);
             shares = (JSONObject) obj;
@@ -82,6 +84,43 @@ public class Model {
             System.out.println(e.getMessage());
         }
             
+        return shares.toString();
+    }
+    
+    
+    /**
+     * Updates shares json object with latest stock quotes
+     * @return String shares json data
+     */
+    private String updateSharesWithLatestStockQuotes(String sharesStr) throws ParseException, IOException {
+        System.out.println("hello");
+        String url;
+        JSONParser parser = new JSONParser();
+        JSONObject shares = (JSONObject) parser.parse(sharesStr);
+        // Loop through shares and call api to get latest quote for each company symbol
+        for(Iterator iterator = shares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject share = (JSONObject) shares.get(key);
+            System.out.println(share);
+            url = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + share.get("companySymbol") + "&apikey=" + this.apiKey;
+            String request = Request.Get(url).execute().returnContent().toString();
+            JSONObject requestParsed = (JSONObject) parser.parse(request);
+            JSONObject realTimeShare = (JSONObject) requestParsed.get("Global Quote");
+            double stockQuote = Double.parseDouble(realTimeShare.get("05. price").toString());
+            JSONObject sharePrice = (JSONObject) share.get("sharePrice");
+            sharePrice.put("value", stockQuote);
+            share.put("sharePrice", sharePrice);
+            System.out.println(share);
+        }
+        
+        return shares.toString();
+    }
+    
+    
+    public JSONObject getAllShares() throws ParseException, IOException {
+        JSONParser parser = new JSONParser();
+        JSONObject shares = (JSONObject) parser.parse(this.getAllSharesFromStorage());
+        JSONObject updatedSharesWithLatestStockQuotes = (JSONObject) parser.parse(this.updateSharesWithLatestStockQuotes(shares.toString()));
         return shares;
     }
     
@@ -90,8 +129,10 @@ public class Model {
      * Loop through shares JSON file and search for the passed company symbol parameter
      * @param companySymbol
      * @return JSONObject
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public JSONObject getShareDataByCompanySymbol(String companySymbol) {
+    public JSONObject getShareDataByCompanySymbol(String companySymbol) throws ParseException, IOException {
         JSONObject shareData = new JSONObject();
         JSONObject allShares = this.getAllShares();
         
@@ -113,8 +154,10 @@ public class Model {
      * Loop through shares JSON file and search for the passed company name parameter
      * @param companyName
      * @return JSONObject
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public JSONObject getShareDataByCompanyName(String companyName) {
+    public JSONObject getShareDataByCompanyName(String companyName) throws ParseException, IOException {
         JSONObject shareData = new JSONObject();
         JSONObject allShares = this.getAllShares();
         
@@ -139,8 +182,10 @@ public class Model {
      * Append each time a share is found to a json object
      * @param numberOfShares
      * @return JSONObject
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public JSONObject getSharesGreaterAvailable(int numberOfShares) {
+    public JSONObject getSharesGreaterAvailable(int numberOfShares) throws ParseException, IOException {
         JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
@@ -161,8 +206,10 @@ public class Model {
      * Append each time a share is found to a json object
      * @param numberOfShares
      * @return JSONObject
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public JSONObject getSharesLessAvailable(int numberOfShares) {
+    public JSONObject getSharesLessAvailable(int numberOfShares) throws ParseException, IOException {
         JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
@@ -183,8 +230,10 @@ public class Model {
      * Append each time a share is found to a json object
      * @param numberOfShares
      * @return JSONObject
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public JSONObject getSharesEqualAvailable(int numberOfShares) {
+    public JSONObject getSharesEqualAvailable(int numberOfShares) throws ParseException, IOException {
         JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
@@ -205,8 +254,10 @@ public class Model {
      * Append each time a share is found to a json object
      * @param currency
      * @return JSONObject
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public JSONObject getSharesByCurrency(String currency) {
+    public JSONObject getSharesByCurrency(String currency) throws ParseException, IOException {
         JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
@@ -228,8 +279,10 @@ public class Model {
      * Append each time a share is found to a json object
      * @param value
      * @return JSONObject
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public JSONObject getSharesLessPriceValue(int value) {
+    public JSONObject getSharesLessPriceValue(int value) throws ParseException, IOException {
         JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
@@ -251,8 +304,10 @@ public class Model {
      * Append each time a share is found to a json object
      * @param value
      * @return JSONObject
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public JSONObject getSharesEqualPriceValue(int value) {
+    public JSONObject getSharesEqualPriceValue(int value) throws ParseException, IOException {
         JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
@@ -274,8 +329,10 @@ public class Model {
      * Append each time a share is found to a json object
      * @param value
      * @return JSONObject
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public JSONObject getSharesGreaterPriceValue(int value) {
+    public JSONObject getSharesGreaterPriceValue(int value) throws ParseException, IOException {
         JSONObject foundShares = new JSONObject();
         JSONObject allShares = this.getAllShares();
 
@@ -300,8 +357,10 @@ public class Model {
      * @param companySymbol
      * @param numberOfShares
      * @return String Error Message or 'OK' success message
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
      */
-    public String buyShares(String companySymbol, int numberOfShares) {
+    public String buyShares(String companySymbol, int numberOfShares) throws ParseException, IOException {
         JSONObject allShares = this.getAllShares();
         JSONObject shareData = this.getShareDataByCompanySymbol(companySymbol);
         
@@ -330,9 +389,10 @@ public class Model {
     }
     
     
-    public static void main(String[] args) {
-        Model d = new Model();
-        System.out.println(d.getSharesEqualAvailable(100));
+    public static void main(String[] args) throws ParseException, IOException {
+        Model model = new Model();
+        model.getAllShares();
+        System.out.println("hello");
     }
     
 }
