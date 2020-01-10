@@ -6,6 +6,7 @@
 package Controllers;
 
 // Standard Libraries
+import java.io.IOException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -19,15 +20,12 @@ import javax.ws.rs.PathParam;
 
 // External Libraries
 import org.json.simple.JSONObject;
+import org.apache.http.client.fluent.Request;
+import org.json.simple.parser.ParseException;
 
 // Custom Classes
 import Models.Model;
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-import org.apache.http.client.fluent.Request;
-import org.json.simple.parser.ParseException;
+
 /**
  * REST Web Service
  *
@@ -55,8 +53,8 @@ public class Controller {
     @GET @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllShares() throws ParseException, IOException {
-       Model data = new Model();
-       JSONObject shares = data.getAllShares();
+       Model model = new Model();
+       JSONObject shares = model.getAllShares();
        return shares.toString();
     }
     
@@ -71,8 +69,8 @@ public class Controller {
     @GET @Path("share/symbol/{companySymbol}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getShareByCompanySymbol(@PathParam("companySymbol") String companySymbol) throws ParseException, IOException {
-        Model data = new Model();
-        JSONObject share = data.getShareDataByCompanySymbol(companySymbol);
+        Model model = new Model();
+        JSONObject share = model.getShareDataByCompanySymbol(companySymbol);
         return share.toString();
     }
     
@@ -87,8 +85,8 @@ public class Controller {
     @GET @Path("share/name/{companyName}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getShareByCompanyName(@PathParam("companyName") String companyName) throws ParseException, IOException {
-        Model data = new Model();
-        JSONObject share = data.getShareDataByCompanyName(companyName);
+        Model model = new Model();
+        JSONObject share = model.getShareDataByCompanyName(companyName);
         return share.toString();
     }
     
@@ -103,8 +101,8 @@ public class Controller {
     @GET @Path("shares/available/greater/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesGreaterAvailable(@PathParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
-        Model data = new Model();
-        JSONObject shares = data.getSharesGreaterAvailable(numberOfShares);
+        Model model = new Model();
+        JSONObject shares = model.getSharesGreaterAvailable(numberOfShares);
         return shares.toString();
     }
     
@@ -119,8 +117,8 @@ public class Controller {
     @GET @Path("shares/available/less/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesLessAvailable(@PathParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
-        Model data = new Model();
-        JSONObject shares = data.getSharesLessAvailable(numberOfShares);
+        Model model = new Model();
+        JSONObject shares = model.getSharesLessAvailable(numberOfShares);
         return shares.toString();
     }
     
@@ -135,8 +133,8 @@ public class Controller {
     @GET @Path("shares/available/equal/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesEqualAvailable(@PathParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
-        Model data = new Model();
-        JSONObject shares = data.getSharesEqualAvailable(numberOfShares);
+        Model model = new Model();
+        JSONObject shares = model.getSharesEqualAvailable(numberOfShares);
         return shares.toString();
     }
     
@@ -151,8 +149,8 @@ public class Controller {
     @GET @Path("shares/currency/{currency}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesByCurrency(@PathParam("currency") String currency) throws ParseException, IOException {
-        Model data = new Model();
-        JSONObject shares = data.getSharesByCurrency(currency);
+        Model model = new Model();
+        JSONObject shares = model.getSharesByCurrency(currency);
         return shares.toString();
     }
     
@@ -167,8 +165,8 @@ public class Controller {
     @GET @Path("shares/value/less/{value}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesLessPriceValue(@PathParam("value") int value) throws ParseException, IOException {
-        Model data = new Model();
-        JSONObject shares = data.getSharesLessPriceValue(value);
+        Model model = new Model();
+        JSONObject shares = model.getSharesLessPriceValue(value);
         return shares.toString();
     }
     
@@ -183,8 +181,8 @@ public class Controller {
     @GET @Path("shares/value/greater/{value}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesGreaterPriceValue(@PathParam("value") int value) throws ParseException, IOException {
-        Model data = new Model();
-        JSONObject shares = data.getSharesGreaterPriceValue(value);
+        Model model = new Model();
+        JSONObject shares = model.getSharesGreaterPriceValue(value);
         return shares.toString();
     }
     
@@ -199,8 +197,8 @@ public class Controller {
     @GET @Path("shares/value/equal/{value}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getSharesEqualPriceValue(@PathParam("value") int value) throws ParseException, IOException {
-        Model data = new Model();
-        JSONObject shares = data.getSharesEqualPriceValue(value);
+        Model model = new Model();
+        JSONObject shares = model.getSharesEqualPriceValue(value);
         return shares.toString();
     }
     
@@ -216,8 +214,8 @@ public class Controller {
     @PUT @Path("buy")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String putJson(@FormParam("companySymbol") String companySymbol, @FormParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
-        Model data = new Model();
-        return data.buyShares(companySymbol, numberOfShares);
+        Model model = new Model();
+        return model.buyShares(companySymbol, numberOfShares);
     }
     
     

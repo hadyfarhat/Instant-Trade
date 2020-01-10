@@ -13,12 +13,13 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import org.apache.http.client.fluent.Request;
 
 // External Libraries
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.apache.http.client.fluent.Request;
+import org.json.simple.JSONArray;
 
 /**
  *
@@ -28,7 +29,7 @@ public class Model {
     
     private final String dataFileName = "shares.json";
     private final String dataFilePath = System.getProperty("user.dir") + "/" + this.dataFileName;
-    private final String apiKey = "MWROBPMAUOMA9TRG";
+    private final String apiKey = "OjY0ODI0YzE5OWViNTIzNjRlMjBjMjQxMDRlM2ZkZWU3";
     
     
     /**
@@ -93,34 +94,92 @@ public class Model {
      * @return String shares json data
      */
     private String updateSharesWithLatestStockQuotes(String sharesStr) throws ParseException, IOException {
-        System.out.println("hello");
         String url;
         JSONParser parser = new JSONParser();
         JSONObject shares = (JSONObject) parser.parse(sharesStr);
+        
         // Loop through shares and call api to get latest quote for each company symbol
         for(Iterator iterator = shares.keySet().iterator(); iterator.hasNext();) {
             String key = (String) iterator.next();
             JSONObject share = (JSONObject) shares.get(key);
-            System.out.println(share);
-            url = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + share.get("companySymbol") + "&apikey=" + this.apiKey;
+            
+            // get real time stock prices
+            url = "https://api-v2.intrinio.com/securities/" + share.get("companySymbol") + "/prices?api_key=" + this.apiKey + "&page_size=1";
             String request = Request.Get(url).execute().returnContent().toString();
+       
+            // parse the request into a json object
             JSONObject requestParsed = (JSONObject) parser.parse(request);
-            JSONObject realTimeShare = (JSONObject) requestParsed.get("Global Quote");
-            double stockQuote = Double.parseDouble(realTimeShare.get("05. price").toString());
+            // get stock prices
+            JSONArray realTimeStocks = (JSONArray) requestParsed.get("stock_prices");
+            JSONObject realTimeStock = (JSONObject) realTimeStocks.get(0);
+            // get security
+            JSONObject security = (JSONObject) requestParsed.get("security");
+            
+            // get stock quote value from stock prices
+            double stockQuote = Double.parseDouble(realTimeStock.get("close").toString());
+            // get currency from security
+            String currency = security.get("currency").toString();
+       
+            // update share json object with the stock quote value and currency
             JSONObject sharePrice = (JSONObject) share.get("sharePrice");
             sharePrice.put("value", stockQuote);
+            sharePrice.put("currency", currency);
             share.put("sharePrice", sharePrice);
-            System.out.println(share);
         }
         
         return shares.toString();
     }
     
     
+    /**
+     * Call api to get the latest currency conversion rate
+     * Apply this rate for each share price value
+     * @param toCurrency
+     * @param sharesStr
+     * @return String shares json
+     * @throws ParseException 
+     */
+    private String updateSharesWithLatestCurrencyConversionRate(String toCurrency, String sharesStr) throws ParseException, IOException {
+        String url;
+        JSONParser parser = new JSONParser();
+        JSONObject shares = (JSONObject) parser.parse(sharesStr);
+        
+        for(Iterator iterator = shares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject share = (JSONObject) shares.get(key);
+            JSONObject sharePrice = (JSONObject) share.get("sharePrice");
+            
+            // get latest currency conversion rate
+            url = "http://localhost:8080/CurrencyConvertor/webresources/exchange-rate/" + sharePrice.get("currency") + "/" + toCurrency;
+            String request = Request.Get(url).execute().returnContent().toString();
+            Double conversionRate = Double.parseDouble(request);
+            
+            // apply conversion rate on share price value
+            Double sharePriceValue = Double.parseDouble(sharePrice.get("value").toString()) * conversionRate;
+            
+            // update share json object with the calculated share price value
+            sharePrice.put("value", sharePriceValue);
+            sharePrice.put("currency", toCurrency);
+            share.put("sharePrice", sharePrice);
+        }
+        
+        return shares.toString();
+    }
+    
+    
+    /**
+     * Gets shares from saved json file
+     * For each share => get latest share price value and currency
+     * For each share => convert share price value to the specified currency
+     * @return String shares json
+     * @throws ParseException
+     * @throws IOException 
+     */
     public JSONObject getAllShares() throws ParseException, IOException {
         JSONParser parser = new JSONParser();
         JSONObject shares = (JSONObject) parser.parse(this.getAllSharesFromStorage());
-        JSONObject updatedSharesWithLatestStockQuotes = (JSONObject) parser.parse(this.updateSharesWithLatestStockQuotes(shares.toString()));
+        JSONObject sharesWithLatestStockQuotes = (JSONObject) parser.parse(this.updateSharesWithLatestStockQuotes(shares.toString()));
+        JSONObject sharesWithCurrencyConversion = (JSONObject) parser.parse(this.updateSharesWithLatestCurrencyConversionRate("GBP", sharesWithLatestStockQuotes.toString()));
         return shares;
     }
     
@@ -392,7 +451,6 @@ public class Model {
     public static void main(String[] args) throws ParseException, IOException {
         Model model = new Model();
         model.getAllShares();
-        System.out.println("hello");
     }
     
 }
