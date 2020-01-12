@@ -27,9 +27,20 @@ import org.json.simple.JSONArray;
  */
 public class Model {
     
+    private final String currency;
     private final String dataFileName = "shares.json";
     private final String dataFilePath = System.getProperty("user.dir") + "/" + this.dataFileName;
     private final String apiKey = "OjY0ODI0YzE5OWViNTIzNjRlMjBjMjQxMDRlM2ZkZWU3";
+    
+    
+    /**
+     * Constructor. The passed currency parameter specifies which currency to be used in every method call
+     * 
+     * @param currency
+     */
+    public Model(String currency) {
+        this.currency = currency;
+    }
     
     
     /**
@@ -169,8 +180,8 @@ public class Model {
     
     /**
      * Gets shares from saved json file
-     * For each share => get latest share price value and currency
-     * For each share => convert share price value to the specified currency
+     * For each share => Call intrinio API to get the latest share price value and currency
+     * For each share => Call Currency Convertor API to convert share price value to the specified currency
      * @return String shares json
      * @throws ParseException
      * @throws IOException 
@@ -179,8 +190,8 @@ public class Model {
         JSONParser parser = new JSONParser();
         JSONObject shares = (JSONObject) parser.parse(this.getAllSharesFromStorage());
         JSONObject sharesWithLatestStockQuotes = (JSONObject) parser.parse(this.updateSharesWithLatestStockQuotes(shares.toString()));
-        JSONObject sharesWithCurrencyConversion = (JSONObject) parser.parse(this.updateSharesWithLatestCurrencyConversionRate("GBP", sharesWithLatestStockQuotes.toString()));
-        return shares;
+        JSONObject sharesWithCurrencyConversion = (JSONObject) parser.parse(this.updateSharesWithLatestCurrencyConversionRate(this.currency, sharesWithLatestStockQuotes.toString()));
+        return sharesWithCurrencyConversion;
     }
     
     
@@ -449,8 +460,8 @@ public class Model {
     
     
     public static void main(String[] args) throws ParseException, IOException {
-        Model model = new Model();
-        model.getAllShares();
+        Model model = new Model("GBP");
+        System.out.println(model.getAllShares());
     }
     
 }

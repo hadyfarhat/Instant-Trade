@@ -46,14 +46,15 @@ public class Controller {
     
     /**
      * Gets all shares from shares json file
+     * @param currency
      * @return JSONObject shares
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
     */
-    @GET @Path("all")
+    @GET @Path("{currency}/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getAllShares() throws ParseException, IOException {
-       Model model = new Model();
+    public String getAllShares(@PathParam("currency") String currency) throws ParseException, IOException {
+       Model model = new Model(currency);
        JSONObject shares = model.getAllShares();
        return shares.toString();
     }
@@ -61,15 +62,16 @@ public class Controller {
     
     /**
      * Gets a share based on the company symbol passed as a parameter
+     * @param currency
      * @param companySymbol
      * @return JSONObject
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    @GET @Path("share/symbol/{companySymbol}")
+    @GET @Path("share/{currency}/symbol/{companySymbol}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getShareByCompanySymbol(@PathParam("companySymbol") String companySymbol) throws ParseException, IOException {
-        Model model = new Model();
+    public String getShareByCompanySymbol(@PathParam("currency") String currency, @PathParam("companySymbol") String companySymbol) throws ParseException, IOException {
+        Model model = new Model(currency);
         JSONObject share = model.getShareDataByCompanySymbol(companySymbol);
         return share.toString();
     }
@@ -77,15 +79,16 @@ public class Controller {
     
     /**
      * Gets a share based on company name
+     * @param currency
      * @param companyName
      * @return JSONObject
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    @GET @Path("share/name/{companyName}")
+    @GET @Path("share/{currency}/name/{companyName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getShareByCompanyName(@PathParam("companyName") String companyName) throws ParseException, IOException {
-        Model model = new Model();
+    public String getShareByCompanyName(@PathParam("currency") String currency, @PathParam("companyName") String companyName) throws ParseException, IOException {
+        Model model = new Model(currency);
         JSONObject share = model.getShareDataByCompanyName(companyName);
         return share.toString();
     }
@@ -93,15 +96,16 @@ public class Controller {
     
     /**
      * Get shares that have available greater than passed param
+     * @param currency
      * @param numberOfShares
      * @return JSONObject
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    @GET @Path("shares/available/greater/{numberOfShares}")
+    @GET @Path("shares/{currency}/available/greater/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getSharesGreaterAvailable(@PathParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
-        Model model = new Model();
+    public String getSharesGreaterAvailable(@PathParam("currency") String currency, @PathParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
+        Model model = new Model(currency);
         JSONObject shares = model.getSharesGreaterAvailable(numberOfShares);
         return shares.toString();
     }
@@ -109,15 +113,16 @@ public class Controller {
     
     /**
      * Get shares that have available less than passed param
+     * @param currency
      * @param numberOfShares
      * @return JSONObject
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    @GET @Path("shares/available/less/{numberOfShares}")
+    @GET @Path("shares/{currency}/available/less/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getSharesLessAvailable(@PathParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
-        Model model = new Model();
+    public String getSharesLessAvailable(@PathParam("currency") String currency, @PathParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
+        Model model = new Model(currency);
         JSONObject shares = model.getSharesLessAvailable(numberOfShares);
         return shares.toString();
     }
@@ -125,47 +130,33 @@ public class Controller {
     
     /**
      * Get shares that have available equal to passed param
+     * @param currency
      * @param numberOfShares
      * @return JSONObject
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    @GET @Path("shares/available/equal/{numberOfShares}")
+    @GET @Path("shares/{currency}/available/equal/{numberOfShares}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getSharesEqualAvailable(@PathParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
-        Model model = new Model();
+    public String getSharesEqualAvailable(@PathParam("currency") String currency, @PathParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
+        Model model = new Model(currency);
         JSONObject shares = model.getSharesEqualAvailable(numberOfShares);
         return shares.toString();
     }
     
     
     /**
-     * Get shares based on the currency passed as a parameter
-     * @param currency
-     * @return JSONObject
-     * @throws org.json.simple.parser.ParseException
-     * @throws java.io.IOException
-     */
-    @GET @Path("shares/currency/{currency}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getSharesByCurrency(@PathParam("currency") String currency) throws ParseException, IOException {
-        Model model = new Model();
-        JSONObject shares = model.getSharesByCurrency(currency);
-        return shares.toString();
-    }
-    
-    
-    /**
      * Get shares that have price value less than passed param
+     * @param currency
      * @param value
      * @return JSONObject
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    @GET @Path("shares/value/less/{value}")
+    @GET @Path("shares/{currency}/value/less/{value}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getSharesLessPriceValue(@PathParam("value") int value) throws ParseException, IOException {
-        Model model = new Model();
+    public String getSharesLessPriceValue(@PathParam("currency") String currency, @PathParam("value") int value) throws ParseException, IOException {
+        Model model = new Model(currency);
         JSONObject shares = model.getSharesLessPriceValue(value);
         return shares.toString();
     }
@@ -173,15 +164,16 @@ public class Controller {
     
     /**
      * Get shares that have price value greater than passed param
+     * @param currency
      * @param value
      * @return JSONObject
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    @GET @Path("shares/value/greater/{value}")
+    @GET @Path("shares/{currency}/value/greater/{value}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getSharesGreaterPriceValue(@PathParam("value") int value) throws ParseException, IOException {
-        Model model = new Model();
+    public String getSharesGreaterPriceValue(@PathParam("currency") String currency, @PathParam("value") int value) throws ParseException, IOException {
+        Model model = new Model(currency);
         JSONObject shares = model.getSharesGreaterPriceValue(value);
         return shares.toString();
     }
@@ -189,15 +181,16 @@ public class Controller {
     
     /**
      * Get shares that have price value equal to passed param
+     * @param currency
      * @param value
      * @return JSONObject
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    @GET @Path("shares/value/equal/{value}")
+    @GET @Path("shares/{currency}/value/equal/{value}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getSharesEqualPriceValue(@PathParam("value") int value) throws ParseException, IOException {
-        Model model = new Model();
+    public String getSharesEqualPriceValue(@PathParam("currency") String currency, @PathParam("value") int value) throws ParseException, IOException {
+        Model model = new Model(currency);
         JSONObject shares = model.getSharesEqualPriceValue(value);
         return shares.toString();
     }
@@ -205,6 +198,7 @@ public class Controller {
  
     /**
      * Updates number of available shares
+     * @param currency
      * @param companySymbol
      * @param numberOfShares
      * @return String status message
@@ -213,8 +207,8 @@ public class Controller {
      */
     @PUT @Path("buy")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String putJson(@FormParam("companySymbol") String companySymbol, @FormParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
-        Model model = new Model();
+    public String putJson(@PathParam("currency") String currency, @FormParam("companySymbol") String companySymbol, @FormParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
+        Model model = new Model(currency);
         return model.buyShares(companySymbol, numberOfShares);
     }
     
