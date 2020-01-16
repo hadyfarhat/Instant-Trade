@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -28,8 +28,10 @@ import org.json.simple.JSONArray;
 public class Model {
     
     private final String currency;
-    private final String dataFileName = "shares.json";
-    private final String dataFilePath = System.getProperty("user.dir") + "/" + this.dataFileName;
+    private final String sharesFileName = "shares.json";
+    private final String sharesFilePath = System.getProperty("user.dir") + "/" + this.sharesFileName;
+    private final String usersFileName = "users.json";
+    private final String usersFilePath = System.getProperty("user.dir") + "/" + this.usersFileName;
     private final String apiKey = "OjY0ODI0YzE5OWViNTIzNjRlMjBjMjQxMDRlM2ZkZWU3";
     
     
@@ -80,22 +82,33 @@ public class Model {
     
     
     /**
-     * Uses Json Parser to parse shares data json file into a json object
-     * @return String shares json data
+     * Converts a json file into a JSONObject
+     * @param filepath
+     * @return JSONObject
      */
-    private String getAllSharesFromStorage() {
-        JSONObject shares = new JSONObject();
+    private JSONObject convertJsonFileToObject(String filepath) {
+        JSONObject obj = new JSONObject();
         JSONParser jsonParser = new JSONParser();
-        try (FileReader reader = new FileReader(this.dataFilePath)) {
+        
+        try (FileReader reader = new FileReader(filepath)) {
             //Read JSON file
-            Object obj = jsonParser.parse(reader);
-            shares = (JSONObject) obj;
+            obj = (JSONObject) jsonParser.parse(reader);
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         } catch (IOException | ParseException e) {
             System.out.println(e.getMessage());
         }
             
+        return obj;
+    }
+    
+    
+    /**
+     * Uses Json Parser to parse shares data json file into a json object
+     * @return String shares json data
+     */
+    private String getAllSharesFromStorage() {
+        JSONObject shares = this.convertJsonFileToObject(this.sharesFilePath);
         return shares.toString();
     }
     
@@ -423,45 +436,157 @@ public class Model {
      * First check if company symbol exists
      * Second check if passed number of shares parameter is less than company's available number of shares
      * If all is valid then subtract the passed number of shares parameter from company's available number of shares
-     * Lastly, save updated json object to file
+     * Update the user data by adding the number of shares bought
      * @param companySymbol
      * @param numberOfShares
-     * @return String Error Message or 'OK' success message
+     * @return json object share that has been updated or an empty json object if there were errors
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    public String buyShares(String companySymbol, int numberOfShares) throws ParseException, IOException {
+    public JSONObject buyShares(String companySymbol, int numberOfShares, String username) throws ParseException, IOException {
         JSONObject allShares = this.getAllShares();
-        JSONObject shareData = this.getShareDataByCompanySymbol(companySymbol);
+        JSONObject share = this.getShareDataByCompanySymbol(companySymbol);
         
-        if (shareData.isEmpty()) {
-            return "Share doesn't exist";
+        if (share.isEmpty()) {
+            return new JSONObject();
         }
         
-        int availableCompanyShares = Integer.parseInt(shareData.get("available").toString());
+        int availableCompanyShares = Integer.parseInt(share.get("available").toString());
         
         if (availableCompanyShares < numberOfShares) {
-            return "Your requested shares amount is greater than the company's available shares";
+            return new JSONObject();
         }
         
+        // Update company shares
         String currentDateTime = this.getCurrentDateTime();
-        shareData.put("available", availableCompanyShares - numberOfShares);
-        shareData.put("lastUpdated", currentDateTime);
-        allShares.put(shareData.get("companySymbol"), shareData);
+        share.put("available", availableCompanyShares - numberOfShares);
+        share.put("lastUpdated", currentDateTime);
+        allShares.put(share.get("companySymbol"), share);
+        
+        // Update user shares
+        JSONObject allUsers = this.getAllUsers();
+        JSONObject user = this.getUser(username);
+        JSONObject userShares = (JSONObject) user.get("shares");
+        
+        int userNumberOfShares = 0;
+        if (userShares.containsKey(companySymbol)) {
+            userNumberOfShares = Integer.parseInt(userShares.get(companySymbol).toString());
+        }
+        userNumberOfShares += numberOfShares;
+        
+        userShares.put(companySymbol, userNumberOfShares);
+        user.put("shares", userShares);
+        allUsers.put(username, user);
+        
 
         try {
-            this.saveJsonObjectToFile(this.dataFilePath, allShares);
+            this.saveJsonObjectToFile(this.sharesFilePath, allShares);
+            this.saveJsonObjectToFile(this.usersFilePath, allUsers);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
         
-        return "OK";
+        return share;
     }
     
     
+    /**
+     * Goes through the user json file and checks if username and password match any data
+     * @param username
+     * @param password
+     * @return boolean
+     */
+    public boolean validateUser(String username, String password) {
+        JSONObject users = this.convertJsonFileToObject(usersFilePath);
+        for(Iterator iterator = users.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject user = (JSONObject) users.get(key);
+            if (user.get("username").equals(username) && user.get("password").equals(password)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    
+    /**
+     * Goes through the user json file and checks if username exists
+     * @param username
+     * @return boolean 
+     */
+    private boolean checkIfUsernameExists(String username) {
+        JSONObject users = this.convertJsonFileToObject(usersFilePath);
+        for(Iterator iterator = users.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject user = (JSONObject) users.get(key);
+            if (user.get("username").equals(username)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    
+    /**
+     * Searches for user by username and returns it as a json object
+     * @return JSONObject user
+     */
+    private JSONObject getUser(String username) {
+        JSONObject users = this.convertJsonFileToObject(usersFilePath);
+
+        for(Iterator iterator = users.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject user = (JSONObject) users.get(key);
+            if (user.get("username").equals(username)) {
+                return user;
+            }
+        }
+        
+        return new JSONObject();
+    }
+    
+    
+    /**
+     * Gets all users from json file
+     * @return JSONObject
+     */
+    private JSONObject getAllUsers() {
+        JSONObject users = this.convertJsonFileToObject(usersFilePath);
+        return users;
+    }
+    
+    
+    /**
+     * Goes through the user json file and checks if username and password match any data
+     * if it doesn't => add it
+     * @param username
+     * @param password
+     * @return boolean
+     * @throws java.io.IOException
+     */
+    public boolean registerUser(String username, String password) throws IOException {        
+        if (!this.checkIfUsernameExists(username)) {
+            JSONObject users = this.convertJsonFileToObject(usersFilePath);
+            JSONObject user = new JSONObject();
+            JSONObject shares = new JSONObject();
+            user.put("username", username);
+            user.put("password", password);
+            user.put("shares", shares);
+            users.put(username, user);
+            System.out.println("User: " + user);
+            this.saveJsonObjectToFile(this.usersFilePath, users);
+            return true;
+        }
+        
+        return false;
+    }
+    
     public static void main(String[] args) throws ParseException, IOException {
         Model model = new Model("GBP");
-        System.out.println(model.getAllShares());
+        boolean valid = model.validateUser("hadyfarhat", "secretpassword");
+        System.out.println(valid);
     }
     
 }

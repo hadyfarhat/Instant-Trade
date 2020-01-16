@@ -26,6 +26,8 @@ import org.json.simple.parser.ParseException;
 // Custom Classes
 import Models.Model;
 
+
+
 /**
  * REST Web Service
  *
@@ -198,26 +200,55 @@ public class Controller {
  
     /**
      * Updates number of available shares
+     * Add the number of bough shares to the user
      * @param currency
      * @param companySymbol
      * @param numberOfShares
-     * @return String status message
+     * @param username
+     * @return String updated share or an empty json if there were errors
      * @throws org.json.simple.parser.ParseException
      * @throws java.io.IOException
      */
-    @PUT @Path("buy")
+    @PUT @Path("{currency}/buy")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String putJson(@PathParam("currency") String currency, @FormParam("companySymbol") String companySymbol, @FormParam("numberOfShares") int numberOfShares) throws ParseException, IOException {
+    public String putJson(@PathParam("currency") String currency,
+                          @FormParam("companySymbol") String companySymbol,
+                          @FormParam("numberOfShares") int numberOfShares,
+                          @FormParam("username") String username) throws ParseException, IOException {
         Model model = new Model(currency);
-        return model.buyShares(companySymbol, numberOfShares);
+        JSONObject updatedShare =  model.buyShares(companySymbol, numberOfShares, username);
+        return updatedShare.toString();
+    }
+    
+
+    /**
+     * Validates User by username and password
+     * @param username
+     * @param password
+     * @return 
+     */
+    @PUT @Path("validateuser")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public boolean validateUser(@FormParam("username") String username, @FormParam("password") String password) {        
+        Model model = new Model("GBP");
+        boolean isValid = model.validateUser(username, password);
+        return isValid;
     }
     
     
-    @GET @Path("currencyconversion/test")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String testCurrencyConversion() throws IOException {
-        String rate = Request.Get("http://localhost:8080/CurrencyConvertor/webresources/CurrencyConvertor").execute().returnContent().toString();
-        return rate;
+    /**
+     * Registers new user
+     * @param username
+     * @param password
+     * @return boolean
+     * @throws java.io.IOException 
+     */
+    @PUT @Path("registeruser")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public boolean registerUser(@FormParam("username") String username, @FormParam("password") String password) throws IOException {        
+        Model model = new Model("GBP");
+        boolean registered = model.registerUser(username, password);
+        return registered;
     }
     
 }
