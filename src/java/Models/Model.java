@@ -296,6 +296,65 @@ public class Model {
     
     
     /**
+     * Get the share with either one of the following types:
+     * - Highest price value
+     * - Lowest price value
+     * - Highest number of available shares
+     * - Lowest number of available shares
+     * @param type
+     * @return JSONObject found share
+     * @throws org.json.simple.parser.ParseException 
+     * @throws java.io.IOException 
+     */
+    public JSONObject simpleSearch(String type) throws ParseException, IOException {
+        JSONObject foundShare;
+        JSONObject allShares = this.getAllShares();
+        
+        // assign foundShare to first share in allShares
+        String firstKey = (String) allShares.keySet().toArray()[0];
+        foundShare = (JSONObject) allShares.get(firstKey);
+        JSONObject foundSharePrice = (JSONObject) foundShare.get("sharePrice");
+        
+        for(Iterator iterator = allShares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject currentShare = (JSONObject) allShares.get(key);
+            JSONObject currentSharePrice = (JSONObject) currentShare.get("sharePrice");
+            
+            if (type.equals("highestPriceValue")) {
+                Double currentSharePriceValue = Double.parseDouble(currentSharePrice.get("value").toString());
+                Double foundSharePriceValue = Double.parseDouble(foundSharePrice.get("value").toString());
+                if (currentSharePriceValue > foundSharePriceValue) {
+                    foundShare = currentShare;
+                    foundSharePrice = (JSONObject) currentShare.get("sharePrice");
+                }
+            } else if (type.equals("lowestPriceValue")) {
+                Double currentSharePriceValue = Double.parseDouble(currentSharePrice.get("value").toString());
+                Double foundSharePriceValue = Double.parseDouble(foundSharePrice.get("value").toString());
+                if (currentSharePriceValue < foundSharePriceValue) {
+                    foundShare = currentShare;
+                    foundSharePrice = (JSONObject) currentShare.get("sharePrice");
+                }
+            } else if (type.equals("highestAvailableNumberOfShares")) {
+                Double currentShareNumOfAvailableShares = Double.parseDouble(currentShare.get("available").toString());
+                Double foundShareNumOfAvailableShares = Double.parseDouble(foundShare.get("available").toString());
+                if (currentShareNumOfAvailableShares > foundShareNumOfAvailableShares) {
+                    foundShare = currentShare;
+                }
+            } else if (type.equals("lowestAvailableNumberOfShares")) {
+                Double currentShareNumOfAvailableShares = Double.parseDouble(currentShare.get("available").toString());
+                Double foundShareNumOfAvailableShares = Double.parseDouble(foundShare.get("available").toString());
+                if (currentShareNumOfAvailableShares < foundShareNumOfAvailableShares) {
+                    foundShare = currentShare;
+                }
+            }
+        }
+        
+        JSONObject share = new JSONObject();
+        share.put(foundShare.get("companySymbol"), foundShare);
+        return share;
+    }
+    
+    /**
      * Loop through shares JSON file and search for the passed company symbol parameter
      * @param companySymbol
      * @return JSONObject
@@ -672,8 +731,8 @@ public class Model {
     
     public static void main(String[] args) throws ParseException, IOException {
         Model model = new Model("GBP");
-        boolean valid = model.validateUser("hadyfarhat", "secretpassword");
-        System.out.println(valid);
+        JSONObject allShares = model.getAllShares();
+        
     }
     
 }

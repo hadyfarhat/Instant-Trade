@@ -90,6 +90,26 @@ public class Controller {
        return shares.toString();
     }
     
+    
+    /**
+     * Get the share with either one of the following types:
+     * - Highest price value
+     * - Lowest price value
+     * - Highest number of available shares
+     * - Lowest number of available shares
+     * @param currency
+     * @param type
+     * @return simple search result as a json string
+     * @throws org.json.simple.parser.ParseException
+     * @throws java.io.IOException
+     */
+    @GET @Path("{currency}/simpleSearch")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String simpleSearch(@PathParam("currency") String currency, @QueryParam("type") String type) throws ParseException, IOException {
+        Model model = new Model(currency);
+        JSONObject share = model.simpleSearch(type);
+        return share.toString();
+    }
  
     /**
      * Updates number of available shares
