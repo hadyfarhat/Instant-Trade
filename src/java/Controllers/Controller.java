@@ -25,6 +25,7 @@ import org.json.simple.parser.ParseException;
 
 // Custom Classes
 import Models.Model;
+import javax.ws.rs.QueryParam;
 
 
 
@@ -58,6 +59,34 @@ public class Controller {
     public String getAllShares(@PathParam("currency") String currency) throws ParseException, IOException {
        Model model = new Model(currency);
        JSONObject shares = model.getAllShares();
+       return shares.toString();
+    }
+    
+    
+    /**
+     * Get shares based on the passed parameters
+     * @param currency
+     * @param sharePriceValueSearchType
+     * @param sharePriceValue
+     * @param availableSharesSearchType
+     * @param availableShares
+     * @param companySymbol
+     * @param companyName
+     * @return shares result as json string
+     * @throws ParseException
+     * @throws IOException 
+     */
+    @GET @Path("{currency}/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getAllShares(@PathParam("currency") String currency,
+                               @QueryParam("sharePriceValueSearchType") String sharePriceValueSearchType,
+                               @QueryParam("sharePriceValue") String sharePriceValue,
+                               @QueryParam("availableSharesSearchType") String availableSharesSearchType,
+                               @QueryParam("availableShares") String availableShares,
+                               @QueryParam("companySymbol") String companySymbol,
+                               @QueryParam("companyName") String companyName) throws ParseException, IOException {
+       Model model = new Model(currency);
+       JSONObject shares = model.getSharesBySearch(sharePriceValueSearchType, sharePriceValue, availableSharesSearchType, availableShares, companySymbol, companyName);
        return shares.toString();
     }
     

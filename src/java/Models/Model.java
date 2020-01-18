@@ -209,6 +209,93 @@ public class Model {
     
     
     /**
+     * Loop through each share and apply the conditions passed as parameters
+     * @param sharePriceValueSearchType
+     * @param sharePriceValue
+     * @param availableSharesSearchType
+     * @param availableShares
+     * @param companySymbol
+     * @param companyName
+     * @return JSONObject of shares found
+     * @throws ParseException
+     * @throws IOException 
+     */
+    public JSONObject getSharesBySearch(String sharePriceValueSearchType,
+                                        String sharePriceValue,
+                                        String availableSharesSearchType,
+                                        String availableShares,
+                                        String companySymbol,
+                                        String companyName) throws ParseException, IOException {
+        JSONObject foundShares = new JSONObject();
+        JSONObject allShares = this.getAllShares();
+        
+        for(Iterator iterator = allShares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject share = (JSONObject) allShares.get(key);
+            JSONObject sharePrice = (JSONObject) share.get("sharePrice");
+            
+            boolean valid = true;
+            
+            // Share Price conditions
+            if (sharePriceValueSearchType != null && !sharePriceValueSearchType.isEmpty()) {
+                if (sharePriceValueSearchType.equals("greaterThan")) {
+                    if (Double.parseDouble(sharePrice.get("value").toString()) <= Double.parseDouble(sharePriceValue)) {
+                        valid = false;
+                    }
+                } else if (sharePriceValueSearchType.equals("lessThan")) {
+                    if (Double.parseDouble(sharePrice.get("value").toString()) >= Double.parseDouble(sharePriceValue)) {
+                        valid = false;
+                    }
+                } else if (sharePriceValueSearchType.equals("equalTo")) {
+                    if (Double.parseDouble(sharePrice.get("value").toString()) != Double.parseDouble(sharePriceValue)) {
+                        valid = false;
+                    }
+                }
+            }
+            
+            // Available Number of Shares conditions
+            if (availableSharesSearchType != null && !availableSharesSearchType.isEmpty()) {
+                if (availableSharesSearchType.equals("greaterThan")) {
+                    if (Double.parseDouble(share.get("available").toString()) <= Double.parseDouble(availableShares)) {
+                        valid = false;
+                    }
+                } else if (availableSharesSearchType.equals("lessThan")) {
+                    if (Double.parseDouble(share.get("available").toString()) >= Double.parseDouble(availableShares)) {
+                        valid = false;
+                    }
+                } else if (availableSharesSearchType.equals("equalTo")) {
+                    if (Double.parseDouble(share.get("available").toString()) != Double.parseDouble(availableShares)) {
+                        valid = false;
+                    }
+                }   
+            }
+            
+            // Company Name Condition
+            if (companyName != null && !companyName.isEmpty()) {
+                if (!share.get("companyName").equals(companyName)) {
+                    valid = false;
+                }
+            }
+            
+            // Company Symbol Condition
+            if (companySymbol != null && !companySymbol.isEmpty()) {
+                if (!share.get("companySymbol").equals(companySymbol)) {
+                    valid = false;
+                }
+            }
+            
+            // if all conditions satisfy => append share to foundShares
+            if (valid) {
+                foundShares.put(share.get("companySymbol"), share);
+            }
+            
+        }
+        
+        return foundShares;
+    }
+    
+    
+    /**
      * Loop through shares JSON file and search for the passed company symbol parameter
      * @param companySymbol
      * @return JSONObject
@@ -373,7 +460,7 @@ public class Model {
             String key = (String) iterator.next();
             JSONObject temp = (JSONObject) allShares.get(key);
             JSONObject tempSharePrice = (JSONObject) temp.get("sharePrice");
-            if (Integer.parseInt(tempSharePrice.get("value").toString()) < value) {
+            if (Double.parseDouble(tempSharePrice.get("value").toString()) < value) {
                 foundShares.put(temp.get("companySymbol"), temp);
             }
         }
@@ -398,7 +485,7 @@ public class Model {
             String key = (String) iterator.next();
             JSONObject temp = (JSONObject) allShares.get(key);
             JSONObject tempSharePrice = (JSONObject) temp.get("sharePrice");
-            if (Integer.parseInt(tempSharePrice.get("value").toString()) == value) {
+            if (Double.parseDouble(tempSharePrice.get("value").toString()) == value) {
                 foundShares.put(temp.get("companySymbol"), temp);
             }
         }
@@ -423,7 +510,7 @@ public class Model {
             String key = (String) iterator.next();
             JSONObject temp = (JSONObject) allShares.get(key);
             JSONObject tempSharePrice = (JSONObject) temp.get("sharePrice");
-            if (Integer.parseInt(tempSharePrice.get("value").toString()) > value) {
+            if (Double.parseDouble(tempSharePrice.get("value").toString()) > value) {
                 foundShares.put(temp.get("companySymbol"), temp);
             }
         }
