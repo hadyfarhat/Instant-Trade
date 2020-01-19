@@ -184,6 +184,7 @@ public class Model {
             sharePrice.put("value", convertedSharePriceValue);
             sharePrice.put("currency", toCurrency);
             share.put("sharePrice", sharePrice);
+            shares.put(share.get("companySymbol"), share);
         }
         
         return shares.toString();
@@ -729,7 +730,7 @@ public class Model {
     }
     
     public static void main(String[] args) throws ParseException, IOException {
-        Model model = new Model("EUR");
+        Model model = new Model("GBP");
         JSONObject allShares = model.getAllShares();
         System.out.println(allShares);
         
