@@ -172,17 +172,16 @@ public class Model {
             String key = (String) iterator.next();
             JSONObject share = (JSONObject) shares.get(key);
             JSONObject sharePrice = (JSONObject) share.get("sharePrice");
+            Double sharePriceValue = Double.parseDouble(sharePrice.get("value").toString());
+            String sharePriceCurrency = (String) sharePrice.get("currency");
             
-            // get latest currency conversion rate
-            url = "http://localhost:8080/CurrencyConvertor/webresources/exchange-rate/" + sharePrice.get("currency") + "/" + toCurrency;
+            // convert share price value to the requested currency
+            url = "http://localhost:8080/CurrencyConvertor/webresources/exchange-rate/" + sharePriceValue + "/" + sharePriceCurrency + "/" + toCurrency;
             String request = Request.Get(url).execute().returnContent().toString();
-            Double conversionRate = Double.parseDouble(request);
-            
-            // apply conversion rate on share price value
-            Double sharePriceValue = Double.parseDouble(sharePrice.get("value").toString()) * conversionRate;
+            Double convertedSharePriceValue = Double.parseDouble(request);
             
             // update share json object with the calculated share price value
-            sharePrice.put("value", sharePriceValue);
+            sharePrice.put("value", convertedSharePriceValue);
             sharePrice.put("currency", toCurrency);
             share.put("sharePrice", sharePrice);
         }
@@ -730,8 +729,9 @@ public class Model {
     }
     
     public static void main(String[] args) throws ParseException, IOException {
-        Model model = new Model("GBP");
+        Model model = new Model("EUR");
         JSONObject allShares = model.getAllShares();
+        System.out.println(allShares);
         
     }
     
