@@ -111,6 +111,7 @@ public class Controller {
         return share.toString();
     }
  
+
     /**
      * Updates number of available shares
      * Add the number of bough shares to the user
@@ -164,4 +165,23 @@ public class Controller {
         return registered;
     }
     
+
+    /**
+     * Sells shares back to the stock market
+     * @param username
+     * @param companySymbol
+     * @param numOfShares
+     * @return 
+     * @throws java.io.IOException 
+     * @throws org.json.simple.parser.ParseException 
+     */
+    @PUT @Path("sellshares")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String sellShares(@FormParam("username") String username, @FormParam("companySymbol") String companySymbol, @FormParam("numOfShares") int numOfShares) throws IOException, ParseException {
+        Model model = new Model("GBP");
+        JSONObject status = model.sellShares(username, companySymbol, numOfShares);
+        return status.toString();
+    }
+    
+
 }

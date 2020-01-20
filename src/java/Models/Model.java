@@ -114,6 +114,29 @@ public class Model {
     
     
     /**
+     * Gets a share from shares.json file
+     * @param companySymbol
+     * @return
+     * @throws ParseException 
+     */
+    private String getShareFromStorage(String companySymbol) throws ParseException {
+        JSONObject share = new JSONObject();
+        JSONParser parser = new JSONParser();
+        JSONObject allShares = (JSONObject) parser.parse(this.getAllSharesFromStorage());
+        
+        for(Iterator iterator = allShares.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            if (key.equals(companySymbol)) {
+                share = (JSONObject) allShares.get(key);
+            }
+            
+        }
+        
+        return share.toString();
+    }
+    
+    
+    /**
      * Updates shares json object with latest stock quotes
      * @return String shares json data
      */
@@ -353,6 +376,7 @@ public class Model {
         share.put(foundShare.get("companySymbol"), foundShare);
         return share;
     }
+    
     
     /**
      * Loop through shares JSON file and search for the passed company symbol parameter
@@ -729,11 +753,144 @@ public class Model {
         return false;
     }
     
+    
+    /**
+     * Gets the shares of a user
+     * @param username
+     * @return JSONOjbect shares
+     */
+    private JSONObject getUserShares(String username) {
+        JSONObject userShares = new JSONObject();
+        
+        JSONObject users = this.convertJsonFileToObject(usersFilePath);
+        for(Iterator iterator = users.keySet().iterator(); iterator.hasNext();) {
+            String key = (String) iterator.next();
+            JSONObject user = (JSONObject) users.get(key);
+            if (user.get("username").equals(username)) {
+                userShares = (JSONObject) user.get("shares");
+                return userShares;
+            }
+        }
+        
+        return userShares;
+    }
+    
+    
+    /**
+     * Validates that user has shares in a company
+     * @param username
+     * @param companySymbol
+     * @return 
+     */
+    private boolean validateUserHasCompanyShares(String username, String companySymbol) {
+        JSONObject userShares = this.getUserShares(username);
+        if (userShares.size() > 0) {
+            for(Iterator iterator = userShares.keySet().iterator(); iterator.hasNext();) {
+                String key = (String) iterator.next();
+                if (key.equals(companySymbol)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    
+    /**
+     * Adds shares to a company
+     * @param companySymbol
+     * @param numOfShares
+     */
+    private void addCompanyShares(String companySymbol, int numOfShares) throws ParseException, IOException {
+        JSONParser parser = new JSONParser();
+        // get share
+        JSONObject share = (JSONObject) parser.parse(this.getShareFromStorage(companySymbol));
+        // get all shares
+        JSONObject allShares = (JSONObject) parser.parse(this.getAllSharesFromStorage());
+        // update num of shares
+        int availableShares = Integer.parseInt(share.get("available").toString());
+        share.put("available", availableShares + numOfShares);
+        allShares.put(share.get("companySymbol"), share);
+        // save shares to file
+        this.saveJsonObjectToFile(this.sharesFilePath, allShares);
+    }
+    
+
+    /**
+     * - Lookup username in users.json
+     *      - validate username exists
+     *      - validate user has any number of shares
+     *      - validate user has shares in the company
+     *      - validate numOfShares less than or equal to user numOfShares
+     * - Subtract numOfShares from user
+     * - Add subtracted numOfShares to the share in shares.json
+     * @param username
+     * @param companySymbol
+     * @param numOfShares
+     * @return json:
+     *      - {"status": "OK", "shares": {shares}, "userShares": {userShares}}
+     *      - {"status": "Err", "errorMessage": "message"}
+     * @throws java.io.IOException
+     * @throws org.json.simple.parser.ParseException
+     */
+    public JSONObject sellShares(String username, String companySymbol, int numOfShares) throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
+        JSONObject status = new JSONObject();
+        JSONObject allUsers = this.getAllUsers();
+        JSONObject user = (JSONObject) allUsers.get(username);
+        
+        // validate username exists
+        boolean usernameExists = this.checkIfUsernameExists(username);
+        if (!usernameExists) {
+            status.put("status", "Err");
+            status.put("errorMessage", "Username does not exist");
+            return status;
+        }
+        
+        // validate userShares num > 0
+        JSONObject userShares = this.getUserShares(username);
+        if (userShares.isEmpty()) {
+            status.put("status", "Err");
+            status.put("errorMessage", "User doesn't have any share");
+            return status;
+        }
+        
+        // validate user has shares in the company
+        boolean userHasSharesInCompany = this.validateUserHasCompanyShares(username, companySymbol);
+        if (!userHasSharesInCompany) {
+            status.put("status", "Err");
+            status.put("errorMessage", "User does not have shares in this company");
+            return status;
+        } 
+
+        // validate numOfShares param <= numOfShares in user
+        System.out.println(userShares);
+        System.out.println(userShares.get(companySymbol));
+        int userCompanyShares = Integer.parseInt(userShares.get(companySymbol).toString());
+        if (numOfShares > userCompanyShares) {
+            status.put("status", "Err");
+            status.put("errorMessage", "Attempting to sell invalid number of shares");
+            return status;
+        }
+        
+        // subtract numOfShares from user shares and save to file
+        userShares.put(companySymbol, userCompanyShares - numOfShares);
+        user.put("shares", userShares);
+        allUsers.put(username, user);
+        this.saveJsonObjectToFile(usersFilePath, allUsers);
+        // add subtracted numOfShares to company and save to file
+        this.addCompanyShares(companySymbol, numOfShares);
+
+        status.put("status", "OK");
+        status.put("userShares", userShares);
+        return status;
+    }
+    
+    
     public static void main(String[] args) throws ParseException, IOException {
         Model model = new Model("GBP");
-        JSONObject allShares = model.getAllShares();
-        System.out.println(allShares);
-        
+        System.out.println(model.sellShares("user2", "AAPL", 100));
     }
     
 }

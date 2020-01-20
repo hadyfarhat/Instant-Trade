@@ -1,10 +1,1 @@
-{
-    "hadyfarhat": {
-        "username": "hadyfarhat",
-        "password": "secretpassword"
-    },
-    "testuser": {
-        "username": "testuser",
-        "password": "password"
-    }
-}
+{"user2":{"shares":{"AAPL":10},"password":"password","username":"user2"},"hadyfarhat":{"shares":{"MSFT":62,"AAPL":14,"JPM":5,"WMT":4},"password":"password","username":"hadyfarhat"},"testuser":{"shares":{},"password":"password","username":"testuser"},"user3":{"shares":{},"password":"password","username":"user3"}}
