@@ -110,7 +110,22 @@ public class Controller {
         JSONObject share = model.simpleSearch(type);
         return share.toString();
     }
- 
+    
+    
+    /**
+     * Gets the shares of a user
+     * @param currency
+     * @param username
+     * @return 
+     */
+    @GET @Path("{currency}/{username}/my-shares")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getUserShares(@PathParam("currency") String currency, @PathParam("username") String username) {
+        Model model = new Model(currency);
+        JSONObject userShares = model.getUserShares(username);
+        return userShares.toString();
+    }
+    
 
     /**
      * Updates number of available shares
@@ -125,7 +140,7 @@ public class Controller {
      */
     @PUT @Path("{currency}/buy")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String putJson(@PathParam("currency") String currency,
+    public String buyShares(@PathParam("currency") String currency,
                           @FormParam("companySymbol") String companySymbol,
                           @FormParam("numberOfShares") int numberOfShares,
                           @FormParam("username") String username) throws ParseException, IOException {

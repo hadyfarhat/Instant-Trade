@@ -759,7 +759,7 @@ public class Model {
      * @param username
      * @return JSONOjbect shares
      */
-    private JSONObject getUserShares(String username) {
+    public JSONObject getUserShares(String username) {
         JSONObject userShares = new JSONObject();
         
         JSONObject users = this.convertJsonFileToObject(usersFilePath);
@@ -865,8 +865,6 @@ public class Model {
         } 
 
         // validate numOfShares param <= numOfShares in user
-        System.out.println(userShares);
-        System.out.println(userShares.get(companySymbol));
         int userCompanyShares = Integer.parseInt(userShares.get(companySymbol).toString());
         if (numOfShares > userCompanyShares) {
             status.put("status", "Err");
@@ -879,6 +877,7 @@ public class Model {
         user.put("shares", userShares);
         allUsers.put(username, user);
         this.saveJsonObjectToFile(usersFilePath, allUsers);
+        
         // add subtracted numOfShares to company and save to file
         this.addCompanyShares(companySymbol, numOfShares);
 
