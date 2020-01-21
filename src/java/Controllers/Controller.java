@@ -20,7 +20,6 @@ import javax.ws.rs.PathParam;
 
 // External Libraries
 import org.json.simple.JSONObject;
-import org.apache.http.client.fluent.Request;
 import org.json.simple.parser.ParseException;
 
 // Custom Classes
@@ -85,9 +84,9 @@ public class Controller {
                                @QueryParam("availableShares") String availableShares,
                                @QueryParam("companySymbol") String companySymbol,
                                @QueryParam("companyName") String companyName) throws ParseException, IOException {
-       Model model = new Model(currency);
-       JSONObject shares = model.getSharesBySearch(sharePriceValueSearchType, sharePriceValue, availableSharesSearchType, availableShares, companySymbol, companyName);
-       return shares.toString();
+        Model model = new Model(currency);
+        JSONObject shares = model.getSharesBySearch(sharePriceValueSearchType, sharePriceValue, availableSharesSearchType, availableShares, companySymbol, companyName);
+        return shares.toString();
     }
     
     
